@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>無限イタリアンブレイン - 究極暗号バフ＆フューズ完全版</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #06060c;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+        .game-container {
+            background: #12121a;
+            max-width: 900px;
+            width: 100%;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.4);
+            border: 2px solid #d4af37;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 5px;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .status-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: #000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #d4af37;
+        }
+        .money-box { font-size: 26px; font-weight: bold; color: #5cb85c; }
+        .mps-box { font-size: 13px; color: #a5d6a7; margin-top: 4px; }
+        .reborn-box { font-size: 14px; color: #ff9800; font-weight: bold; text-align: right; }
+        .target-box { font-size: 13px; color: #f0ad4e; font-weight: bold; text-align: right; margin-top: 4px; }
+        .action-row { display: block; margin-bottom: 20px; }
+        .reborn-btn {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold;
+            border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(156,39,176,0.3);
+            width: 100%; text-align: center;
+        }
+        .reborn-btn:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; }
+        .section-title { font-size: 14px; color: #d4af37; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; display: flex; justify-content: space-between; }
+        .conveyor-lane { background: #181822; height: 145px; border-radius: 10px; margin-bottom: 25px; position: relative; overflow: hidden; border: 2px solid #444; box-shadow: inset 0 0 25px rgba(0,0,0,0.9); }
+        .conveyor-bg { position: absolute; width: 100%; height: 100%; background: linear-gradient(90deg, transparent 49%, #242430 50%, #242430 51%, transparent 52%); background-size: 60px 100%; }
+        .flow-card { position: absolute; top: 10px; left: -150px; width: 130px; height: 115px; background: #222; border: 3px solid #fff; border-radius: 8px; text-align: center; cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.6); user-select: none; }
+        .flow-rarity { font-size: 9px; font-weight: bold; padding: 2px 0; color: #fff; text-transform: uppercase; border-radius: 4px 4px 0 0; }
+        .flow-name { font-size: 10px; font-weight: bold; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; color: #fff; }
+        .flow-cost { font-size: 11px; font-weight: bold; margin-top: 2px; color: #ffeb3b; }
+        .flow-inc { font-size: 9px; color: #81c784; font-weight: bold; margin-top: 1px; }
+        .flow-traits { font-size: 9px; margin-top: 2px; font-weight: bold; display: flex; justify-content: center; gap: 3px; }
+        .trait-badge { padding: 1px 3px; border-radius: 3px; color: #fff; }
+        .mut-badge { padding: 1px 3px; border-radius: 3px; color: #fff; background: #cf1f1f; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { 0% { box-shadow: 0 0 2px #cf1f1f; } 100% { box-shadow: 0 0 8px #ff3333; } }
+        .my-team-zone { background: #030306; border: 1px dashed #d4af37; border-radius: 10px; padding: 15px; max-height: 350px; overflow-y: auto; margin-bottom: 25px; }
+        .team-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .team-card { background: #1a1a24; border-radius: 6px; padding: 6px; width: 90px; text-align: center; font-size: 9px; border: 1px solid #444; position: relative; }
+        .sell-btn { margin-top: 5px; background: #cc3333; color: white; border: none; padding: 2px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; width: 100%; font-weight: bold; }
+        .sell-btn:hover { background: #ff3333; }
+        .fuse-send-btn { margin-top: 3px; background: #9c27b0; color: white; border: none; padding: 2px 6px; font-size: 9px; border-radius: 3px; cursor: pointer; width: 100%; font-weight: bold; }
+        .fuse-send-btn:hover { background: #ba68c8; }
+        .reset-btn { position: absolute; top: 20px; right: 20px; background: #444; color: #aaa; border: none; padding: 5px 10px; font-size: 10px; border-radius: 4px; cursor: pointer; }
+        .reset-btn:hover { background: #cc3333; color: #fff; }
+        .fuse-machine-zone { background: #1a101f; border: 2px dashed #9c27b0; border-radius: 10px; padding: 15px; box-shadow: 0 0 20px rgba(156, 39, 176, 0.2); }
+        .fuse-slots { display: flex; justify-content: center; gap: 12px; margin: 15px 0; }
+        .fuse-slot { width: 85px; height: 85px; background: #09060f; border: 2px solid #553366; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; color: #888; text-align: center; padding: 4px; box-sizing: border-box; transition: all 0.2s; }
+        .fuse-slot.filled { border-color: #9c27b0; color: #fff; background: #251430; }
+        .fuse-slot-remove { font-size: 8px; color: #ff5555; margin-top: 3px; background: rgba(0,0,0,0.5); padding: 1px 3px; border-radius: 2px; }
+        .fuse-execute-btn { background: linear-gradient(135deg, #e91e63, #9c27b0); color: white; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(233,30,99,0.3); }
+        .fuse-execute-btn:disabled { background: #222; color: #555; cursor: not-allowed; box-shadow: none; }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <button class="reset-btn" onclick="resetAllGameData()">データ削除リセット</button>
+    <h1>🕵️‍♂️ 無限イタリアンブレイン：究極1000%フューズ＆暗号バフ版</h1>
+    
+    <div class="status-board">
+        <div>
+            <div class="money-box">資金: <span id="money-disp">100</span> 円</div>
+            <div class="mps-box">総秒給: +<span id="mps-disp">0</span> 円/秒 (倍率: <span id="multiplier-disp">1.0</span>倍)</div>
+        </div>
+        <div>
+            <div class="reborn-box">生まれ変わり数: <span id="reborn-disp">0</span> 回</div>
+            <div class="target-box">次回開始金: <span style="color:#ffeb3b;" id="next-start-disp">500</span> 円</div>
+        </div>
+    </div>
+
+    <div class="action-row">
+        <button class="reborn-btn" id="reborn-button" onclick="triggerReborn()" disabled>
+            🌀 生まれ変わる (要 <span id="reborn-cost-disp">100,000</span> 円)<br>
+            <span style="font-size:11px; font-weight:normal;">【特典】アジト枠+5 ＆ 全キャラ倍率+0.5倍 ＆ 次回開始金3倍！</span>
+        </button>
+    </div>
+
+    <div class="section-title">
+        <span>🏃‍♂️ 流れるエージェント（クリックで雇用）</span>
+        <span style="color: #aaa;" id="spawn-counter">出現種類: 0種</span>
+    </div>
+    <div class="conveyor-lane">
+        <div class="conveyor-bg"></div>
+        <div id="lane-container"></div>
+    </div>
+
+    <div class="section-title">
+        <span>🏰 あなたのアジト（売却 / フューズスロットへ送信）</span>
+        <span style="color: #5cb85c; font-weight: bold;" id="team-counter">基地の空き枠: 0 / 10 人</span>
+    </div>
+    <div class="my-team-zone">
+        <div class="team-grid" id="team-container"></div>
+    </div>
+
+    <!-- 🧪 キメラ生成フューズマシーン -->
+    <div class="fuse-machine-zone">
+        <div class="section-title" style="color: #e91e63; border-color: #552233; margin-bottom: 5px;">
+            <span>🧪 禁忌のフューズマシーン（アジトから4体選んで合成）</span>
+            <span style="color: #aaa; font-weight: normal; font-size: 11px;">30%で一階級上に昇格（1000%有料）！70%で降格……</span>
+        </div>
+        <div class="fuse-slots">
+            <div class="fuse-slot" id="fuse-slot-0" onclick="removeFromFuse(0)">【空き枠】<br>選択して下さい</div>
+            <div class="fuse-slot" id="fuse-slot-1" onclick="removeFromFuse(1)">【空き枠】<br>選択して下さい</div>
+            <div class="fuse-slot" id="fuse-slot-2" onclick="removeFromFuse(2)">【空き枠】<br>選択して下さい</div>
+            <div class="fuse-slot" id="fuse-slot-3" onclick="removeFromFuse(3)">【空き枠】<br>選択して下さい</div>
+        </div>
+        <button class="fuse-execute-btn" id="fuse-button" onclick="executeCharacterFusion()" disabled>
+            💥 遺伝子コード融合を実行する（4体必要）
+        </button>
+    </div>
+
+    <!-- ⚙️ 秘密の暗号入力端末 -->
+    <div class="fuse-machine-zone" style="background: #090e14; border-color: #5bcb85; margin-top: 25px; box-shadow: 0 0 20px rgba(91, 184, 133, 0.2);">
+        <div class="section-title" style="color: #5bcb85; border-color: #224433; margin-bottom: 8px;">
+            <span>📟 秘密の暗号入力端末（数字コード入力）</span>
+            <span style="color: #aaa; font-weight: normal; font-size: 11px;">有効なコードは1回のみ使用可能です</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="secret-code-input" placeholder="暗号コード（数字）を入力..." style="flex: 1; background: #000; border: 1px solid #5bcb85; border-radius: 4px; color: #5bcb85; padding: 10px; font-weight: bold; font-family: monospace;">
+            <button onclick="submitSecretCode()" style="background: linear-gradient(135deg, #5bcb85, #11998e); color: #fff; border: none; padding: 0 20px; font-weight: bold; border-radius: 4px; cursor: pointer;">送信</button>
+        </div>
+        <div id="code-timer-status" style="font-size: 11px; color: #a5d6a7; margin-top: 8px; display: flex; flex-direction: column; gap: 2px;"></div>
+    </div>
+</div>
+<script>
+    // --- ゲームの基本ステータス管理 ---
+    let money = 100;
+    let totalMps = 0;
+    let activeFlowingChars = [];
+    let myTeam = [];
+    let flowingIdCounter = 0;
+
+    // --- 10倍無限転生システム用変数 ---
+    let rebornCount = 0;
+    let teamLimit = 10;        
+    let earnMultiplier = 1.0;  
+    let rebornCost = 100000;   
+    let nextStartMoney = 500;  
+
+    // 🧪 フューズマシーン選択状態管理
+    let fuseSelectedIds = [null, null, null, null];
+
+    // 📟 【新設】シリアル暗号コード・バフタイマー管理
+    let usedSecretCodes = [];        // 使用済みコードのブラックリスト記録（2重防止）
+    let codeBuffDoubleEndTime = 0;   // 4649: 2倍倍率の終了時刻（ミリ秒）
+    let codeBuffLuckEndTime = 0;     // 6667: 10倍ラックの終了時刻（ミリ秒）
+    let codeBuffRainbowEndTime = 0;  // 7777: 確定レインボーの終了時刻（ミリ秒）
+
+    // ⭐ 600人すべてのデータを格納する絶対のメイン配列
+    const fullCharDatabase = [];
+    // --- キャラクター登録：Common（コモン全50体一挙登録） ---
+    fullCharDatabase.push(
+        { name: "見習いスリ", cost: 50, income: 2, rarity: "Common", color: "#9e9e9e", emoji: "🎒", speed: 1.5, weight: 100 },
+        { name: "ピザ配達偽装員", cost: 120, income: 5, rarity: "Common", color: "#9e9e9e", emoji: "🍕", speed: 1.6, weight: 95 },
+        { name: "下水道潜入員", cost: 260, income: 12, rarity: "Common", color: "#9e9e9e", emoji: "🕳️", speed: 1.5, weight: 90 },
+        { name: "ピッキング練習生", cost: 480, income: 25, rarity: "Common", color: "#9e9e9e", emoji: "🔑", speed: 1.7, weight: 85 },
+        { name: "アマチュアハッカー", cost: 850, income: 48, rarity: "Common", color: "#9e9e9e", emoji: "💻", speed: 1.6, weight: 80 },
+        { name: "路地裏の情報屋", cost: 1400, income: 85, rarity: "Common", color: "#9e9e9e", emoji: "🚬", speed: 1.5, weight: 75 },
+        { name: "闇の運び屋ボーイ", cost: 2400, income: 160, rarity: "Common", color: "#9e9e9e", emoji: "📦", speed: 1.8, weight: 70 },
+        { name: "変装用メイク係", cost: 4000, income: 280, rarity: "Common", color: "#9e9e9e", emoji: "🎨", speed: 1.6, weight: 65 },
+        { name: "監視カメラ目くらまし", cost: 6500, income: 480, rarity: "Common", color: "#9e9e9e", emoji: "📷", speed: 1.7, weight: 60 },
+        { name: "偽造パスポート職人", cost: 10000, income: 800, rarity: "Common", color: "#9e9e9e", emoji: "🪪", speed: 1.6, weight: 55 },
+        { name: "サイレン消音技師", cost: 14000, income: 1150, rarity: "Common", color: "#9e9e9e", emoji: "🔕", speed: 1.7, weight: 52 },
+        { name: "指紋消去の拭き屋", cost: 18500, income: 1600, rarity: "Common", color: "#9e9e9e", emoji: "🧼", speed: 1.5, weight: 50 },
+        { name: "盗難自転車ナビゲーター", cost: 23000, income: 2100, rarity: "Common", color: "#9e9e9e", emoji: "🚲", speed: 1.8, weight: 48 },
+        { name: "居眠り警備員の友人", cost: 29000, income: 2800, rarity: "Common", color: "#9e9e9e", emoji: "💤", speed: 1.4, weight: 46 },
+        { name: "スクラップ工場の解体屋", cost: 36000, income: 3600, rarity: "Common", color: "#9e9e9e", emoji: "🏗️", speed: 1.6, weight: 44 },
+        { name: "無線電波の妨害工作員", cost: 44000, income: 4600, rarity: "Common", color: "#9e9e9e", emoji: "📡", speed: 1.7, weight: 42 },
+        { name: "変装用ウイッグ美容師", cost: 53000, income: 5800, rarity: "Common", color: "#9e9e9e", emoji: "💇‍♀️", speed: 1.5, weight: 40 },
+        { name: "裏口カギの型取り職人", cost: 63000, income: 7200, rarity: "Common", color: "#9e9e9e", emoji: "🕯️", speed: 1.6, weight: 38 },
+        { name: "おとり用クラッカー花火師", cost: 75000, income: 9000, rarity: "Common", color: "#9e9e9e", emoji: "🎆", speed: 1.8, weight: 36 },
+        { name: "夜間暗視ゴーグル商人", cost: 88000, income: 11000, rarity: "Common", color: "#9e9e9e", emoji: "🥽", speed: 1.7, weight: 34 },
+        { name: "路地裏の靴磨きスパイ", cost: 102000, income: 13200, rarity: "Common", color: "#9e9e9e", emoji: "🥾", speed: 1.5, weight: 32 },
+        { name: "新聞配達のカムフラージュ員", cost: 118000, income: 15800, rarity: "Common", color: "#9e9e9e", emoji: "📰", speed: 1.6, weight: 30 },
+        { name: "裏通りの果物売り情報屋", cost: 135000, income: 18800, rarity: "Common", color: "#9e9e9e", emoji: "🍎", speed: 1.5, weight: 29 },
+        { name: "ビル清鎖の忍び込み員", cost: 155000, income: 22400, rarity: "Common", color: "#9e9e9e", emoji: "🧹", speed: 1.7, weight: 28 },
+        { name: "水道メーター偽装師", cost: 178000, income: 26500, rarity: "Common", color: "#9e9e9e", emoji: "  ", speed: 1.6, weight: 27 },
+        { name: "浮浪者のふりした見張り役", cost: 205000, income: 31200, rarity: "Common", color: "#9e9e9e", emoji: "🧔", speed: 1.4, weight: 26 },
+        { name: "夜間ポスター貼り工作員", cost: 235000, income: 36800, rarity: "Common", color: "#9e9e9e", emoji: "🖼️", speed: 1.8, weight: 25 },
+        { name: "ドミノ配達の爆走レーサー", cost: 270000, income: 43500, rarity: "Common", color: "#9e9e9e", emoji: "🛵", speed: 1.9, weight: 24 },
+        { name: "地下街の偽ブランドディーラー", cost: 310000, income: 51200, rarity: "Common", color: "#9e9e9e", emoji: "👜", speed: 1.6, weight: 23 },
+        { name: "夜間工事のダミー作業員", cost: 355000, income: 60200, rarity: "Common", color: "#9e9e9e", emoji: "🚧", speed: 1.5, weight: 22 },
+        { name: "ジャンク屋の部品密売人", cost: 405000, income: 70500, rarity: "Common", color: "#9e9e9e", emoji: "⚙️", speed: 1.7, weight: 21 },
+        { name: "闇の電報配達人", cost: 462000, income: 82500, rarity: "Common", color: "#9e9e9e", emoji: "✉️", speed: 1.8, weight: 20 },
+        { name: "図書館の古書暗号解読生", cost: 525000, income: 96500, rarity: "Common", color: "#9e9e9e", emoji: "📚", speed: 1.4, weight: 19 },
+        { name: "コインランドリーの連絡員", cost: 595000, income: 112500, rarity: "Common", color: "#9e9e9e", emoji: "🧺", speed: 1.6, weight: 18 },
+        { name: "カラス操りの伝書鳩使い", cost: 675000, income: 130500, rarity: "Common", color: "#9e9e9e", emoji: "🦅", speed: 1.7, weight: 17 },
+        { name: "下乗り調教の競馬ジョッキー", cost: 765000, income: 151500, rarity: "Common", color: "#9e9e9e", emoji: "🏇", speed: 1.8, weight: 16 },
+        { name: "廃墟ビルに巣食う不法占拠者", cost: 865000, income: 175500, rarity: "Common", color: "#9e9e9e", emoji: "🏚️", speed: 1.4, weight: 15 },
+        { name: "裏家業専門の引っ越し屋", cost: 975000, income: 202500, rarity: "Common", color: "#9e9e9e", emoji: "📦", speed: 1.7, weight: 14 },
+        { name: "ピザ窯隠しの盗聴アンテナ職人", cost: 1100000, income: 233500, rarity: "Common", color: "#9e9e9e", emoji: "🍕", speed: 1.6, weight: 13 },
+        { name: "野良犬寄せの肉球マニア", cost: 1240000, income: 268500, rarity: "Common", color: "#9e9e9e", emoji: "🐾", speed: 1.5, weight: 12 },
+        { name: "自動販売機釣り銭漁りの王", cost: 1395000, income: 308500, rarity: "Common", color: "#9e9e9e", emoji: "🪙", speed: 1.6, weight: 11 },
+        { name: "深夜の看板ライト消し屋", cost: 1565000, income: 353500, rarity: "Common", color: "#9e9e9e", emoji: "💡", speed: 1.7, weight: 10 },
+        { name: "高架下のストリートグラフィティ士", cost: 1755000, income: 404500, rarity: "Common", color: "#9e9e9e", emoji: "🎨", speed: 1.8, weight: 9 },
+        { name: "下町ボロアパートの大家", cost: 1965000, income: 461500, rarity: "Common", color: "#9e9e9e", emoji: "🏠", speed: 1.3, weight: 8 },
+        { name: "廃タイヤの隠し金庫番", cost: 2195000, income: 525500, rarity: "Common", color: "#9e9e9e", emoji: "🛞", speed: 1.6, weight: 7 },
+        { name: "裏口ゴミ箱に潜むスパイ潜入員", cost: 2455000, income: 597500, rarity: "Common", color: "#9e9e9e", emoji: "🗑️", speed: 1.5, weight: 6 },
+        { name: "合鍵を落とさせるスリ技術生", cost: 2745000, income: 677500, rarity: "Common", color: "#9e9e9e", emoji: "🗝️", speed: 1.7, weight: 5 },
+        { name: "深夜バスのルート観測屋", cost: 3065000, income: 766500, rarity: "Common", color: "#9e9e9e", emoji: "🚌", speed: 1.6, weight: 4 },
+        { name: "繁華街のティッシュ配り偵察員", cost: 3415000, income: 865500, rarity: "Common", color: "#9e9e9e", emoji: "🧻", speed: 1.8, weight: 3 },
+        { name: "マンホール開閉のプロ初心者", cost: 3800000, income: 975500, rarity: "Common", color: "#9e9e9e", emoji: "🕳️", speed: 1.5, weight: 2 }
+    );
+    // --- キャラクター登録：Uncommon（アンコンモン全50体一挙登録） ---
+    fullCharDatabase.push(
+        { name: "バール使いの達人", cost: 4200000, income: 1100000, rarity: "Uncommon", color: "#4caf50", emoji: "🔨", speed: 1.9, weight: 80 },
+        { name: "金庫破りのスピード狂", cost: 4650000, income: 1250000, rarity: "Uncommon", color: "#4caf50", emoji: "🔓", speed: 2.0, weight: 80 },
+        { name: "ワイヤーアクション担当", cost: 5150000, income: 1420000, rarity: "Uncommon", color: "#4caf50", emoji: "🪢", speed: 2.1, weight: 80 },
+        { name: "催眠ガス専門家", cost: 5700000, income: 1610000, rarity: "Uncommon", color: "#4caf50", emoji: "💨", speed: 1.9, weight: 80 },
+        { name: "逃走用爆速バイク乗り", cost: 6300000, income: 1820000, rarity: "Uncommon", color: "#4caf50", emoji: "🏍️", speed: 2.2, weight: 80 },
+        { name: "盗聴器仕掛けのプロ", cost: 6950000, income: 2050000, rarity: "Uncommon", color: "#4caf50", emoji: "🎙️", speed: 2.0, weight: 80 },
+        { name: "変装マジシャン", cost: 7650000, income: 2310000, rarity: "Uncommon", color: "#4caf50", emoji: "🪄", speed: 2.1, weight: 80 },
+        { name: "暗号解読アナリスト", cost: 8400000, income: 2600000, rarity: "Uncommon", color: "#4caf50", emoji: "📊", speed: 2.0, weight: 80 },
+        { name: "カジノのイカサマ師", cost: 9250000, income: 2920000, rarity: "Uncommon", color: "#4caf50", emoji: "🃏", speed: 2.3, weight: 80 },
+        { name: "闇医者の調合師", cost: 10200000, income: 3280000, rarity: "Uncommon", color: "#4caf50", emoji: "🧪", speed: 2.1, weight: 80 },
+        { name: "サーモグラフィ無効化員", cost: 11250000, income: 3680000, rarity: "Uncommon", color: "#4caf50", emoji: "🌡️", speed: 2.0, weight: 80 },
+        { name: "高圧電流カット専門家", cost: 12400000, income: 4120000, rarity: "Uncommon", color: "#4caf50", emoji: "⚡", speed: 2.2, weight: 80 },
+        { name: "ダミー防犯カメラ技師", cost: 13650000, income: 4610000, rarity: "Uncommon", color: "#4caf50", emoji: "📹", speed: 2.1, weight: 80 },
+        { name: "金庫ダイヤル聴音士", cost: 15000000, income: 5150000, rarity: "Uncommon", color: "#4caf50", emoji: "🎧", speed: 1.9, weight: 80 },
+        { name: "おとり用クラクション魔", cost: 16500000, income: 5750000, rarity: "Uncommon", color: "#4caf50", emoji: "📢", speed: 2.4, weight: 80 },
+        { name: "夜警スケジュール盗掘屋", cost: 18150000, income: 6410000, rarity: "Uncommon", color: "#4caf50", emoji: "📅", speed: 2.0, weight: 80 },
+        { name: "通気口マップマニア", cost: 19950000, income: 7140000, rarity: "Uncommon", color: "#4caf50", emoji: "🗺️", speed: 2.1, weight: 80 },
+        { name: "赤外線レーザー視覚化師", cost: 21900000, income: 7940000, rarity: "Uncommon", color: "#4caf50", emoji: "👓", speed: 2.2, weight: 80 },
+        { name: "重要書類シュレッダー復元師", cost: 24000000, income: 8820000, rarity: "Uncommon", color: "#4caf50", emoji: "🧩", speed: 2.0, weight: 80 },
+        { name: "脱出用高速ボート操縦士", cost: 26300000, income: 9790000, rarity: "Uncommon", color: "#4caf50", emoji: "🚤", speed: 2.5, weight: 80 },
+        { name: "現金輸送車ルート追跡屋", cost: 28800000, income: 10860000, rarity: "Uncommon", color: "#4caf50", emoji: "🚚", speed: 2.1, weight: 80 },
+        { name: "電磁パルスグレネード兵", cost: 31550000, income: 12040000, rarity: "Uncommon", color: "#4caf50", emoji: "💣", speed: 2.3, weight: 80 },
+        { name: "地下シェルター採掘屋", cost: 34550000, income: 13340000, rarity: "Uncommon", color: "#4caf50", emoji: "⛏️", speed: 1.8, weight: 80 },
+        { name: "闇オークションの競り子", cost: 37850000, income: 14770000, rarity: "Uncommon", color: "#4caf50", emoji: "🔨", speed: 2.2, weight: 80 },
+        { name: "重要参考人の偽証請負人", cost: 41450000, income: 16340000, rarity: "Uncommon", color: "#4caf50", emoji: "⚖️", speed: 2.0, weight: 80 },
+        { name: "警備犬用高級ステーキ係", cost: 45400000, income: 18070000, rarity: "Uncommon", color: "#4caf50", emoji: "🥩", speed: 2.1, weight: 80 },
+        { name: "セキュリティカード複製屋", cost: 49700000, income: 19970000, rarity: "Uncommon", color: "#4caf50", emoji: "💳", speed: 2.2, weight: 80 },
+        { name: "足跡偽装の靴職人", cost: 54400000, income: 22060000, rarity: "Uncommon", color: "#4caf50", emoji: "👞", speed: 1.9, weight: 80 },
+        { name: "壁抜けの軟体マジシャン", cost: 59550000, income: 24360000, rarity: "Uncommon", color: "#4caf50", emoji: "🤸", speed: 2.4, weight: 80 },
+        { name: "怪盗アジトの天才料理長", cost: 65150000, income: 26890000, rarity: "Uncommon", color: "#4caf50", emoji: "🍳", speed: 2.0, weight: 80 },
+        { name: "防犯シャッター鍵開け師", cost: 71300000, income: 29670000, rarity: "Uncommon", color: "#4caf50", emoji: "🔓", speed: 2.0, weight: 80 },
+        { name: "地下道マッピングマニア", cost: 78050000, income: 32720000, rarity: "Uncommon", color: "#4caf50", emoji: "🗺️", speed: 1.9, weight: 80 },
+        { name: "サーモ遮断スーツ職人", cost: 85450000, income: 36070000, rarity: "Uncommon", color: "#4caf50", emoji: "🧥", speed: 2.1, weight: 80 },
+        { name: "警察犬のドッグトレーナー", cost: 93550000, income: 39740000, rarity: "Uncommon", color: "#4caf50", emoji: "🐕", speed: 2.2, weight: 80 },
+        { name: "監視ドローン捕獲網使い", cost: 102400000, income: 43760000, rarity: "Uncommon", color: "#4caf50", emoji: "🕸️", speed: 2.3, weight: 80 },
+        { name: "トラック密航ドライバー", cost: 112100000, income: 48160000, rarity: "Uncommon", color: "#4caf50", emoji: "🚚", speed: 2.0, weight: 80 },
+        { name: "ホテル受付の鍵コピー係", cost: 122750000, income: 52980000, rarity: "Uncommon", color: "#4caf50", emoji: "🔑", speed: 2.1, weight: 80 },
+        { name: "タイピスト偽装員", cost: 134400000, income: 58250000, rarity: "Uncommon", color: "#4caf50", emoji: "⌨️", speed: 2.0, weight: 80 },
+        { name: "電磁波遮断シールド展開兵", cost: 147150000, income: 64020000, rarity: "Uncommon", color: "#4caf50", emoji: "🛡️", speed: 2.2, weight: 80 },
+        { name: "夜警スケジュール割り出し屋", cost: 161100000, income: 70340000, rarity: "Uncommon", color: "#4caf50", emoji: "📅", speed: 1.9, weight: 80 },
+        { name: "無線周波数ジャック担当", cost: 176400000, income: 77260000, rarity: "Uncommon", color: "#4caf50", emoji: "📻", speed: 2.4, weight: 80 },
+        { name: "サイレント忍者", cost: 193150000, income: 84840000, rarity: "Uncommon", color: "#4caf50", emoji: "🥷", speed: 2.5, weight: 80 },
+        { name: "高級車セキュリティクラッカー", cost: 211500000, income: 93130000, rarity: "Uncommon", color: "#4caf50", emoji: "🚘", speed: 2.3, weight: 80 },
+        { name: "金庫衝撃波吸収ダンパー工", cost: 231600000, income: 102200000, rarity: "Uncommon", color: "#4caf50", emoji: "🧱", speed: 2.0, weight: 80 },
+        { name: "逃走用ルート先導バギー乗り", cost: 253600000, income: 112130000, rarity: "Uncommon", color: "#4caf50", emoji: "🚙", speed: 2.4, weight: 80 },
+        { name: "高層ビル屋上ジップライナー", cost: 277700000, income: 123000000, rarity: "Uncommon", color: "#4caf50", emoji: "🪢", speed: 2.5, weight: 80 },
+        { name: "防犯ガラス無音カッター職人", cost: 304050000, income: 134910000, rarity: "Uncommon", color: "#4caf50", emoji: "💎", speed: 2.1, weight: 80 },
+        { name: "警察無線スクランブル担当", cost: 332950000, income: 147950000, rarity: "Uncommon", color: "#4caf50", emoji: "🗣️", speed: 2.2, weight: 80 },
+        { name: "重要ルート障害物撤去班長", cost: 364600000, income: 162220000, rarity: "Uncommon", color: "#4caf50", emoji: "🚜", speed: 2.3, weight: 80 },
+        { name: "シリコン生体彫刻家", cost: 399250000, income: 177860000, rarity: "Uncommon", color: "#4caf50", emoji: "🫲", speed: 2.0, weight: 80 }
+    );
+    // --- キャラクター登録：Rare（レア全50体一挙登録） ---
+    fullCharDatabase.push(
+        { name: "高周波レーザーカッター", cost: 437000000, income: 195000000, rarity: "Rare", color: "#2196f3", emoji: "🔦", speed: 2.4, weight: 30 },
+        { name: "ドローン偵察兵", cost: 478000000, income: 213000000, rarity: "Rare", color: "#2196f3", emoji: "🛸", speed: 2.5, weight: 30 },
+        { name: "銀行システムクラッカー", cost: 523000000, income: 233000000, rarity: "Rare", color: "#2196f3", emoji: "🏦", speed: 2.6, weight: 30 },
+        { name: "罠解除のスナイパー", cost: 572000000, income: 255000000, rarity: "Rare", color: "#2196f3", emoji: "🎯", speed: 2.5, weight: 30 },
+        { name: "気球離脱のエキスパート", cost: 626000000, income: 279000000, rarity: "Rare", color: "#2196f3", emoji: "🎈", speed: 2.7, weight: 30 },
+        { name: "裏口ハッキングAI", cost: 685000000, income: 305000000, rarity: "Rare", color: "#2196f3", emoji: "🤖", speed: 2.6, weight: 30 },
+        { name: "暗黒街の用心棒", cost: 750000000, income: 334000000, rarity: "Rare", color: "#2196f3", emoji: "🕶️", speed: 2.5, weight: 30 },
+        { name: "深夜のナイトウォーカー", cost: 821000000, income: 365000000, rarity: "Rare", color: "#2196f3", emoji: "🥷", speed: 2.8, weight: 30 },
+        { name: "偽札偽造のグラフィック師", cost: 899000000, income: 400000000, rarity: "Rare", color: "#2196f3", emoji: "💵", speed: 2.6, weight: 30 },
+        { name: "密輸船のキャプテン", cost: 984000000, income: 438000000, rarity: "Rare", color: "#2196f3", emoji: "🚢", speed: 2.7, weight: 30 },
+        { name: "暗号貨幣マネーロンダラー", cost: 1077000000, income: 479000000, rarity: "Rare", color: "#2196f3", emoji: "🪙", speed: 2.5, weight: 30 },
+        { name: "GPS情報攪乱ハッカー", cost: 1179000000, income: 524000000, rarity: "Rare", color: "#2196f3", emoji: "📍", speed: 2.6, weight: 30 },
+        { name: "VIP寝返り誘導スパイ", cost: 1291000000, income: 573000000, rarity: "Rare", color: "#2196f3", emoji: "👄", speed: 2.4, weight: 30 },
+        { name: "防犯赤外線すり抜け師", cost: 1414000000, income: 627000000, rarity: "Rare", color: "#2196f3", emoji: "🤸‍♀️", speed: 2.8, weight: 30 },
+        { name: "煙幕スクリーンの魔術師", cost: 1548000000, income: 686000000, rarity: "Rare", color: "#2196f3", emoji: "🌫️", speed: 2.7, weight: 30 },
+        { name: "生体認証偽造シリコン師", cost: 1695000000, income: 751000000, rarity: "Rare", color: "#2196f3", emoji: "🖐️", speed: 2.5, weight: 30 },
+        { name: "重要通信の傍受暗号兵", cost: 1856000000, income: 822000000, rarity: "Rare", color: "#2196f3", emoji: "🛜", speed: 2.6, weight: 30 },
+        { name: "夜間ビル壁面登攀士", cost: 2032000000, income: 900000000, rarity: "Rare", color: "#2196f3", emoji: "🧗", speed: 2.9, weight: 30 },
+        { name: "地下金庫の音響解析屋", cost: 2225000000, income: 985000000, rarity: "Rare", color: "#2196f3", emoji: "🩺", speed: 2.5, weight: 30 },
+        { name: "美術品すり替え贋作師", cost: 2436000000, income: 1078000000, rarity: "Rare", color: "#2196f3", emoji: "🖼️", speed: 2.6, weight: 30 },
+        { name: "監視網ジャミング技術兵", cost: 2667000000, income: 1180000000, rarity: "Rare", color: "#2196f3", emoji: "📺", speed: 2.7, weight: 30 },
+        { name: "警察無線偽装オペレーター", cost: 2920000000, income: 1292000000, rarity: "Rare", color: "#2196f3", emoji: "📻", speed: 2.5, weight: 30 },
+        { name: "逃走用ステルスバギー乗り", cost: 3197000000, income: 1414000000, rarity: "Rare", color: "#2196f3", emoji: "🏎️", speed: 2.9, weight: 30 },
+        { name: "防犯センサー氷結師", cost: 3501000000, income: 1548000000, rarity: "Rare", color: "#2196f3", emoji: "❄️", speed: 2.6, weight: 30 },
+        { name: "闇金融の資金調達人", cost: 3834000000, income: 1695000000, rarity: "Rare", color: "#2196f3", emoji: "📈", speed: 2.4, weight: 30 },
+        { name: "高層ビル間ワイヤー滑走士", cost: 4198000000, income: 1856000000, rarity: "Rare", color: "#2196f3", emoji: "🦅", speed: 3.0, weight: 30 },
+        { name: "警備システム裏口販売員", cost: 4597000000, income: 2032000000, rarity: "Rare", color: "#2196f3", emoji: "🚪", speed: 2.5, weight: 30 },
+        { name: "特殊溶解液の化学者", cost: 5034000000, income: 2225000000, rarity: "Rare", color: "#2196f3", emoji: "🧪", speed: 2.6, weight: 30 },
+        { name: "闇密売コーディネーター", cost: 5512000000, income: 2436000000, rarity: "Rare", color: "#2196f3", emoji: "🤝", speed: 2.5, weight: 30 },
+        { name: "特殊迷彩マント裁縫師", cost: 6036000000, income: 2667000000, rarity: "Rare", color: "#2196f3", emoji: "🧥", speed: 2.4, weight: 30 },
+        { name: "音響カモフラージュ技師", cost: 6610000000, income: 2920000000, rarity: "Rare", color: "#2196f3", emoji: "🔊", speed: 2.6, weight: 30 },
+        { name: "防犯ガラス無音超音波士", cost: 7238000000, income: 3197000000, rarity: "Rare", color: "#2196f3", emoji: "🔮", speed: 2.7, weight: 30 },
+        { name: "警備ドローン回路ハッカー", cost: 7926000000, income: 3501000000, rarity: "Rare", color: "#2196f3", emoji: "⚙️", speed: 2.8, weight: 30 },
+        { name: "闇社会の暗号プログラマー", cost: 8679000000, income: 3834000000, rarity: "Rare", color: "#2196f3", emoji: "🔣", speed: 2.6, weight: 30 },
+        { name: "映像ループ細工師", cost: 9504000000, income: 4198000000, rarity: "Rare", color: "#2196f3", emoji: "🔄", speed: 2.7, weight: 30 },
+        { name: "地下トンネル高速掘削士", cost: 10407000000, income: 4597000000, rarity: "Rare", color: "#2196f3", emoji: "🚇", speed: 2.5, weight: 30 },
+        { name: "高難度金庫熱線カッター", cost: 11396000000, income: 5034000000, rarity: "Rare", color: "#2196f3", emoji: "🔥", speed: 2.8, weight: 30 },
+        { name: "密告者データ消去人", cost: 12479000000, income: 5512000000, rarity: "Rare", color: "#2196f3", emoji: "🧹", speed: 2.6, weight: 30 },
+        { name: "闇の電報塔ジャッカー", cost: 13665000000, income: 6036000000, rarity: "Rare", color: "#2196f3", emoji: "🗼", speed: 2.9, weight: 30 },
+        { name: "スキャンミニカメラ使い", cost: 14963000000, income: 6610000000, rarity: "Rare", color: "#2196f3", emoji: "🔍", speed: 2.5, weight: 30 },
+        { name: "追跡GPS発信機破壊屋", cost: 16385000000, income: 7238000000, rarity: "Rare", color: "#2196f3", emoji: "🔨", speed: 2.7, weight: 30 },
+        { name: "変装マスク立体整形師", cost: 17942000000, income: 7926000000, rarity: "Rare", color: "#2196f3", emoji: "🎭", speed: 2.6, weight: 30 },
+        { name: "警備犬誘惑調合士", cost: 19647000000, income: 8679000000, rarity: "Rare", color: "#2196f3", emoji: "🧪", speed: 2.6, weight: 30 },
+        { name: "指紋情報書き換え装置", cost: 21514000000, income: 9504000000, rarity: "Rare", color: "#2196f3", emoji: "💾", speed: 2.7, weight: 30 },
+        { name: "ゴーグル妨害閃光兵", cost: 23558000000, income: 10407000000, rarity: "Rare", color: "#2196f3", emoji: "🔦", speed: 2.8, weight: 30 },
+        { name: "衝撃波吸収マット敷き", cost: 25796000000, income: 11396000000, rarity: "Rare", color: "#2196f3", emoji: "🧘", speed: 2.5, weight: 30 },
+        { name: "障害物排除屋", cost: 28247000000, income: 12479000000, rarity: "Rare", color: "#2196f3", emoji: "🚧", speed: 2.7, weight: 30 },
+        { name: "油圧ジャッキ使い", cost: 30931000000, income: 13665000000, rarity: "Rare", color: "#2196f3", emoji: "🏋️", speed: 2.6, weight: 30 },
+        { name: "暗号通貨洗浄人", cost: 33870000000, income: 14963000000, rarity: "Rare", color: "#2196f3", emoji: "🧺", speed: 2.5, weight: 30 },
+        { name: "秘密要塞建築士", cost: 37088000000, income: 16385000000, rarity: "Rare", color: "#2196f3", emoji: "🏰", speed: 2.6, weight: 30 }
+    );
+    // --- キャラクター登録：Epic（エピック全50体一挙登録） ---
+    fullCharDatabase.push(
+        { name: "サイバー特殊工作員", cost: 40612000000, income: 17942000000, rarity: "Epic", color: "#9c27b0", emoji: "📳", speed: 3.0, weight: 15 },
+        { name: "重力無視のパルクール隊", cost: 44471000000, income: 19647000000, rarity: "Epic", color: "#9c27b0", emoji: "🏃‍♂️", speed: 3.2, weight: 15 },
+        { name: "大富豪の偽執事", cost: 48696000000, income: 21514000000, rarity: "Epic", color: "#9c27b0", emoji: "🤵‍♂️", speed: 2.9, weight: 15 },
+        { name: "ステルス戦闘ヘリ乗り", cost: 53323000000, income: 23558000000, rarity: "Epic", color: "#9c27b0", emoji: "🚁", speed: 3.3, weight: 15 },
+        { name: "怪盗お抱えの宝石鑑定士", cost: 58390000000, income: 25796000000, rarity: "Epic", color: "#9c27b0", emoji: "💎", speed: 3.0, weight: 15 },
+        { name: "防犯網全シャットダウン員", cost: 63937000000, income: 28247000000, rarity: "Epic", color: "#9c27b0", emoji: "🔌", speed: 3.1, weight: 15 },
+        { name: "ブラックマーケットの顔役", cost: 70012000000, income: 30931000000, rarity: "Epic", color: "#9c27b0", emoji: "💼", speed: 3.0, weight: 15 },
+        { name: "洗脳催眠マジシャン", cost: 76664000000, income: 33870000000, rarity: "Epic", color: "#9c27b0", emoji: "👁️", speed: 3.2, weight: 15 },
+        { name: "怪盗団の専属スナイパー", cost: 83948000000, income: 37088000000, rarity: "Epic", color: "#9c27b0", emoji: "🔫", speed: 3.4, weight: 15 },
+        { name: "潜水艦強奪キャプテン", cost: 91924000000, income: 40612000000, rarity: "Epic", color: "#9c27b0", emoji: "🤿", speed: 3.1, weight: 15 },
+        { name: "重要閣僚スキャンダルハンター", cost: 100657000000, income: 44471000000, rarity: "Epic", color: "#9c27b0", emoji: "📸", speed: 3.0, weight: 15 },
+        { name: "軍事用人工知能クラッカー", cost: 110220000000, income: 48696000000, rarity: "Epic", color: "#9c27b0", emoji: "🦾", speed: 3.2, weight: 15 },
+        { name: "超音波センサー破壊屋", cost: 120692000000, income: 53323000000, rarity: "Epic", color: "#9c27b0", emoji: "🦇", speed: 3.3, weight: 15 },
+        { name: "バイオ3Dプリンター師", cost: 132159000000, income: 58390000000, rarity: "Epic", color: "#9c27b0", emoji: "🖨️", speed: 2.9, weight: 15 },
+        { name: "国家安全保障網の裏切り者", cost: 144715000000, income: 63937000000, rarity: "Epic", color: "#9c27b0", emoji: "☠️", speed: 3.4, weight: 15 },
+        { name: "ディープフェイク偽装員", cost: 158464000000, income: 70012000000, rarity: "Epic", color: "#9c27b0", emoji: "👤", speed: 3.1, weight: 15 },
+        { name: "海底光ファイバー盗聴兵", cost: 173520000000, income: 76664000000, rarity: "Epic", color: "#9c27b0", emoji: "📟", speed: 3.0, weight: 15 },
+        { name: "衛星レーザー軌道ジャッカー", cost: 190006000000, income: 83948000000, rarity: "Epic", color: "#9c27b0", emoji: "⚡", speed: 3.5, weight: 15 },
+        { name: "闇の最高法廷買収ブローカー", cost: 208058000000, income: 91924000000, rarity: "Epic", color: "#9c27b0", emoji: "📜", speed: 3.0, weight: 15 },
+        { name: "地下銀行の極秘監査役", cost: 227825000000, income: 100657000000, rarity: "Epic", color: "#9c27b0", emoji: "🏛️", speed: 3.2, weight: 15 },
+        { name: "電磁波銃使い", cost: 249470000000, income: 110220000000, rarity: "Epic", color: "#9c27b0", emoji: "🔫", speed: 3.3, weight: 15 },
+        { name: "記憶消去の神経科学者", cost: 273171000000, income: 120692000000, rarity: "Epic", color: "#9c27b0", emoji: "🧠", speed: 3.1, weight: 15 },
+        { name: "手配データ消去ハッカー", cost: 299124000000, income: 132159000000, rarity: "Epic", color: "#9c27b0", emoji: "❌", speed: 3.4, weight: 15 },
+        { name: "超音速ジェット操縦士", cost: 327542000000, income: 144715000000, rarity: "Epic", color: "#9c27b0", emoji: "✈️", speed: 3.6, weight: 15 },
+        { name: "パラシュート急襲兵", cost: 358661000000, income: 158464000000, rarity: "Epic", color: "#9c27b0", emoji: "🪂", speed: 3.5, weight: 15 },
+        { name: "熱感知器冷却スプレー魔", cost: 392735000000, income: 173520000000, rarity: "Epic", color: "#9c27b0", emoji: "🌬️", speed: 3.2, weight: 15 },
+        { name: "超高額美術品ディーラー", cost: 430047000000, income: 190006000000, rarity: "Epic", color: "#9c27b0", emoji: "🏺", speed: 3.0, weight: 15 },
+        { name: "レーダー妨害ドーム技師", cost: 470904000000, income: 208058000000, rarity: "Epic", color: "#9c27b0", emoji: "🌐", speed: 3.1, weight: 15 },
+        { name: "DNAダミー書き換え師", cost: 515642000000, income: 227825000000, rarity: "Epic", color: "#9c27b0", emoji: "🧬", speed: 3.3, weight: 15 },
+        { name: "国際犯罪連合の議長", cost: 564631000000, income: 249470000000, rarity: "Epic", color: "#9c27b0", emoji: "👔", speed: 3.2, weight: 15 },
+        { name: "網膜スキャン偽造眼科医", cost: 618273000000, income: 273171000000, rarity: "Epic", color: "#9c27b0", emoji: "👁️", speed: 3.3, weight: 15 },
+        { name: "特殊爆薬調合士", cost: 677011000000, income: 299124000000, rarity: "Epic", color: "#9c27b0", emoji: "🧨", speed: 3.5, weight: 15 },
+        { name: "セキュリティ侵入AI", cost: 741329000000, income: 327542000000, rarity: "Epic", color: "#9c27b0", emoji: "💻", speed: 3.4, weight: 15 },
+        { name: "ホバークラフト特攻乗り", cost: 811757000000, income: 358661000000, rarity: "Epic", color: "#9c27b0", emoji: "🛸", speed: 3.6, weight: 15 },
+        { name: "洗浄信託銀行頭取", cost: 888876000000, income: 392735000000, rarity: "Epic", color: "#9c27b0", emoji: "🏦", speed: 3.1, weight: 15 },
+        { name: "幻影パフォーマー", cost: 973321000000, income: 430047000000, rarity: "Epic", color: "#9c27b0", emoji: "💃", speed: 3.4, weight: 15 },
+        { name: "巨大潜水空母キャプテン", cost: 1065789000000, income: 470904000000, rarity: "Epic", color: "#9c27b0", emoji: "⚓", speed: 3.2, weight: 15 },
+        { name: "極秘電波塔ジャッカー", cost: 1167041000000, income: 515642000000, rarity: "Epic", color: "#9c27b0", emoji: "📡", speed: 3.5, weight: 15 },
+        { name: "最高警戒金庫熱線カッター", cost: 1277912000000, income: 564631000000, rarity: "Epic", color: "#9c27b0", emoji: "💥", speed: 3.6, weight: 15 },
+        { name: "最高法務顧問", cost: 1399315000000, income: 618273000000, rarity: "Epic", color: "#9c27b0", emoji: "⚖️", speed: 3.1, weight: 15 },
+        { name: "サイバーコア・エグゼクティブ", cost: 3800000000000, income: 168000000000, rarity: "Epic", color: "#9c27b0", emoji: "🧬", speed: 3.3, weight: 12 },
+        { name: "量子セクター防犯妨害部隊", cost: 10000000000000, income: 425000000000, rarity: "Epic", color: "#9c27b0", emoji: "💾", speed: 3.4, weight: 12 },
+        { name: "ダークネット金融工作小隊", cost: 27800000000000, income: 1245000000000, rarity: "Epic", color: "#9c27b0", emoji: "📈", speed: 3.2, weight: 12 },
+        { name: "特殊迷彩急襲コマンド", cost: 78100000000000, income: 3801000000000, rarity: "Epic", color: "#9c27b0", emoji: "🪂", speed: 3.5, weight: 11 },
+        { name: "深海光ファイバー侵入小隊", cost: 131400000000000, income: 6649000000000, rarity: "Epic", color: "#9c27b0", emoji: "🤿", speed: 3.1, weight: 11 },
+        { name: "セクターオメガ防衛解除班・影", cost: 4580000000000, income: 102650000000, rarity: "Epic", color: "#9c27b0", emoji: "⚙️", speed: 3.4, weight: 10 },
+        { name: "インフィニティハッカー・プロト", cost: 5152000000000, income: 116510000000, rarity: "Epic", color: "#9c27b0", emoji: "🥷", speed: 3.3, weight: 10 },
+        { name: "裏世界経済システムバグ", cost: 5796000000000, income: 132240000000, rarity: "Epic", color: "#9c27b0", emoji: "📉", speed: 3.5, weight: 10 },
+        { name: "次元の狭間の密売人・見習い", cost: 6520000000000, income: 150100000000, rarity: "Epic", color: "#9c27b0", emoji: "🌌", speed: 3.4, weight: 10 },
+        { name: "世界怪盗連盟大幹部", cost: 3467860000000, income: 1532251000000, rarity: "Epic", color: "#9c27b0", emoji: "👑", speed: 3.2, weight: 10 }
+    );
+    // --- キャラクター登録：Legendary ＆ Mythic（全50体） ---
+    fullCharDatabase.push(
+        { name: "伝説のルパン四世", cost: 650000000000000, income: 3700000000000, rarity: "Legendary", color: "#ff9800", emoji: "🎩", speed: 3.8, weight: 10 },
+        { name: "国際金融フィクサー・Mr.G", cost: 720000000000000, income: 41000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🕶️", speed: 3.6, weight: 10 },
+        { name: "超国家情報院極秘司令官", cost: 800000000000000, income: 46000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦅", speed: 3.7, weight: 9 },
+        { name: "人工衛星完全クラッキング班", cost: 890000000000000, income: 52000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🛰️", speed: 4.0, weight: 9 },
+        { name: "量子暗号スパイマスター", cost: 990000000000000, income: 59000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🔮", speed: 3.9, weight: 9 },
+        { name: "透過能力の幽霊怪盗", cost: 1100000000000000, income: 67000000000000, rarity: "Legendary", color: "#ff9800", emoji: "👻", speed: 4.2, weight: 8 },
+        { name: "時空指名手配の未来怪盗", cost: 1220000000000000, income: 76000000000000, rarity: "Legendary", color: "#ff9800", emoji: "⏳", speed: 4.1, weight: 8 },
+        { name: "回路喰いのナノマシン工作群", cost: 1350000000000000, income: 86000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦠", speed: 4.3, weight: 8 },
+        { name: "月面極秘プラント闇ギルド総帥", cost: 1500000000000000, income: 98000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌙", speed: 4.0, weight: 7 },
+        { name: "高次元座標の完全破棄者", cost: 1660000000000000, income: 112000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌌", speed: 4.5, weight: 7 },
+        { name: "ブラックマーケットの支配者", cost: 1840000000000000, income: 128000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🪐", speed: 4.2, weight: 6 },
+        { name: "金庫溶解重力サイボーグ", cost: 2040000000000000, income: 146000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🤖", speed: 4.4, weight: 6 },
+        { name: "並行世界強奪の魔女", cost: 2260000000000000, income: 166000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🧙‍♀️", speed: 4.6, weight: 5 },
+        { name: "反物質セキュリティ無効化兵", cost: 2510000000000000, income: 189000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🔮", speed: 4.5, weight: 5 },
+        { name: "インターポール永続クラッカー", cost: 2780000000000000, income: 215000000000000, rarity: "Legendary", color: "#ff9800", emoji: "💻", speed: 4.3, weight: 4 },
+        { name: "歴史改変タイムスパイ", cost: 3080000000000000, income: 245000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🕰️", speed: 4.7, weight: 4 },
+        { name: "霊魂化されたハッカー神", cost: 3420000000000000, income: 279000000000000, rarity: "Legendary", color: "#ff9800", emoji: "✨", speed: 4.4, weight: 3 },
+        { name: "十次元宇宙遺産メガバイヤー", cost: 3790000000000000, income: 317000000000000, rarity: "Legendary", color: "#ff9800", emoji: "👜", speed: 4.2, weight: 3 },
+        { name: "世界経済崩壊ハックトリガー", cost: 4200000000000000, income: 360000000000000, rarity: "Legendary", color: "#ff9800", emoji: "📉", speed: 4.8, weight: 2 },
+        { name: "宇宙犯罪連合総統・ドン", cost: 4660000000000000, income: 409000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦁", speed: 4.5, weight: 2 },
+        { name: "虚空の執行ハッカー T-X1", cost: 5170000000000000, income: 464000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 3.9, weight: 2 },
+        { name: "虚空の執行ハッカー T-X2", cost: 5730000000000000, income: 527000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 4.0, weight: 2 },
+        { name: "虚空の執行ハッカー T-X3", cost: 6350000000000000, income: 598000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 4.1, weight: 2 },
+        { name: "虚空の執行ハッカー T-X4", cost: 7040000000000000, income: 679000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 4.2, weight: 2 },
+        { name: "虚空の執行ハッカー T-X5", cost: 7810000000000000, income: 771000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 4.3, weight: 2 },
+        { name: "デジタルゴースト Ω-01", cost: 14590000000000000, income: 1646000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🤖", speed: 4.9, weight: 1 },
+        { name: "デジタルゴースト Ω-02", cost: 16190000000000000, income: 1867000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🤖", speed: 5.0, weight: 1 },
+        { name: "デジタルゴースト Ω-03", cost: 17970000000000000, income: 2118000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🤖", speed: 5.1, weight: 1 },
+        { name: "サイバーシャドウ Z-01", cost: 41420000000000000, income: 5792000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🥷", speed: 5.0, weight: 1 },
+        { name: "サイバーシャドウ Z-02", cost: 45980000000000000, income: 6569000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🥷", speed: 5.0, weight: 1 },
+        { name: "プラズマハッカー 01", cost: 120000000000000000, income: 20500000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 5.3, weight: 1 },
+        { name: "プラズマハッカー 02", cost: 135000000000000000, income: 23200000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🦾", speed: 5.3, weight: 1 },
+        { name: "コアオペレーター X-1", cost: 388000000000000000, income: 72400000000000000, rarity: "Legendary", color: "#ff9800", emoji: "💻", speed: 5.5, weight: 1 },
+        { name: "コアオペレーター X-2", cost: 436000000000000000, income: 82100000000000000, rarity: "Legendary", color: "#ff9800", emoji: "💻", speed: 5.5, weight: 1 },
+        { name: "次元の狭間の密売人 A", cost: 1255000000000000000, income: 255100000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌌", speed: 5.8, weight: 1 },
+        { name: "次元の狭間の密売人 B", cost: 1412000000000000000, income: 289500000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌌", speed: 5.8, weight: 1 },
+        { name: "セクターオメガ防衛解除班", cost: 4071000000000000000, income: 904400000000000000, rarity: "Legendary", color: "#ff9800", emoji: "⚙️", speed: 5.4, weight: 1 },
+        { name: "インフィニティクローン α", cost: 13222000000000000000, income: 3209100000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🥷", speed: 5.6, weight: 1 },
+        { name: "インフィニティクローン β", cost: 14874000000000000000, income: 3641200000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🥷", speed: 5.6, weight: 1 },
+        { name: "次元の狭間の密売人 H", cost: 2860000000000000000, income: 618500000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌌", speed: 5.9, weight: 1 },
+        { name: "次元の狭間の密売人 I", cost: 3217000000000000000, income: 702000000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌌", speed: 5.9, weight: 1 },
+        { name: "次元の狭間の密売人 J", cost: 3619000000000000000, income: 796800000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🌌", speed: 5.9, weight: 1 },
+        { name: "ブラックホール観測エグゼ", cost: 45000000000000000, income: 820000000000000, rarity: "Legendary", color: "#ff9800", emoji: "🕳️", speed: 4.8, weight: 1 },
+        { name: "ダークセクター最高幹部 A", cost: 52000000000000000, income: 990000000000000, rarity: "Legendary", color: "#ff9800", emoji: "👑", speed: 4.7, weight: 1 },
+        { name: "ダークセクター最高幹部 B", cost: 60000000000000000, income: 1200000000000000, rarity: "Legendary", color: "#ff9800", emoji: "👑", speed: 4.7, weight: 1 },
+        // --- 🔴 Mythic ---
+        { name: "超空間の崩壊バイヤーオメガ", cost: 73300000000000000000, income: 2000000000000000000, rarity: "Mythic", color: "#e91e63", emoji: "👜", speed: 6.0, weight: 5 },
+        { name: "世界経済支配のトリガー", cost: 82400000000000000000, income: 2500000000000000000, rarity: "Mythic", color: "#e91e63", emoji: "📉", speed: 6.1, weight: 5 },
+        { name: "究極電子コード・オメガ", cost: 92860000000000000000, income: 3200000000000000000, rarity: "Mythic", color: "#e91e63", emoji: "🧿", speed: 6.2, weight: 4 },
+        { name: "次元終焉を見届ける黒猫", cost: 104470000000000000000, income: 4500000000000000000, rarity: "Mythic", color: "#e91e63", emoji: "🐈‍⬛", speed: 6.3, weight: 4 },
+        { name: "イタリアンブレインの化身", cost: 117530000000000000000, income: 9999999999999999999, rarity: "Mythic", color: "#e91e63", emoji: "🧠🇮🇹", speed: 6.5, weight: 3 }
+    );
+    // --- キャラクター登録：God全50体 ＆ 新ランクOriginal ＆ 融合体キメラ ---
+    fullCharDatabase.push(
+        // --- ✨ 新ランク：Original (OG) 一体限定（シリアルコードによる支給用） ---
+        { name: "【始祖】始まらせたイタリアの脳", cost: 410000000000000, income: 1850000000000, rarity: "Original", color: "#e1b12c", emoji: "👑🧠🇮🇹", speed: 2.8, weight: 0 },
+
+        // --- 🪐 大増量：神(God全50体全員) ---
+        { name: "絶対時間監視神クロノス", cost: 20000000000000000000000, income: 8000000000000000000000, rarity: "God", color: "#00ffff", emoji: "⏳👁️", speed: 6.6, weight: 5 },
+        { name: "世界线収束の観測神", cost: 25000000000000000000000, income: 11000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🌌", speed: 6.6, weight: 5 },
+        { name: "暗黒物質の支配神ネロ", cost: 40000000000000000000000, income: 20000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🌑", speed: 6.5, weight: 5 },
+        { name: "因果律ハックマスター", cost: 50000000000000000000000, income: 28000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🔮", speed: 6.8, weight: 5 },
+        { name: "星間経済の支配神", cost: 4800000000000000000000000, income: 6200000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🪐", speed: 7.3, weight: 5 },
+        { name: "超光速マネージャッカー", cost: 85000000000000000000000000, income: 130000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "⚡🎒", speed: 7.6, weight: 4 },
+        { name: "天界統括最高神ゼウスΩ", cost: 500000000000000000000000, income: 60000000000000000000000, rarity: "God", color: "#00ffff", emoji: "⚡👑", speed: 8.0, weight: 4 },
+        { name: "冥府因果律の天秤ハデス", cost: 650000000000000000000000, income: 82000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🔱💀", speed: 7.8, weight: 4 },
+        { name: "絶対海領域支配ポセイドン", cost: 850000000000000000000000, income: 110000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🔱🌊", speed: 7.9, weight: 4 },
+        { name: "破壊と再生の神格シヴァ", cost: 1100000000000000000000000, income: 150000000000000000000000, rarity: "God", color: "#00ffff", emoji: "👁️🔥", speed: 8.2, weight: 4 },
+        { name: "世界蛇ヨルムンガンドコア", cost: 1500000000000000000000000, income: 210000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐍🌐", speed: 7.5, weight: 4 },
+        { name: "最高太陽神プロトコルラー", cost: 2000000000000000000000000, income: 290000000000000000000000, rarity: "God", color: "#00ffff", emoji: "☀️🦅", speed: 8.1, weight: 4 },
+        { name: "月天幻惑の女神アルテミス", cost: 2700000000000000000000000, income: 400000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🌙🏹", speed: 8.3, weight: 4 },
+        { name: "全軍神の遺伝子統括アレス", cost: 3600000000000000000000000, income: 550000000000000000000000, rarity: "God", color: "#00ffff", emoji: "⚔️🛡️", speed: 8.0, weight: 4 },
+        { name: "冥界の番犬守護神ケルベロス", cost: 4800000000000000000000000, income: 750000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐕‍🦺⛓️", speed: 8.4, weight: 4 },
+        { name: "因果逆転の堕天使ルシファー", cost: 6400000000000000000000000, income: 1000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "👿🪶", speed: 8.5, weight: 3 },
+        { name: "無限財宝神マモンハック", cost: 8500000000000000000000000, income: 1400000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🪙💰", speed: 7.7, weight: 3 },
+        { name: "嫉妬の暴食龍レヴィアタン", cost: 11000000000000000000000000, income: 1950000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐉🌊", speed: 7.9, weight: 3 },
+        { name: "憤怒の魔王サタンブレイカー", cost: 15000000000000000000000000, income: 2700000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🌋🔥", speed: 8.2, weight: 3 },
+        { name: "強欲経済の具現バアルゼブブ", cost: 20000000000000000000000000, income: 3800000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🪰📉", speed: 7.6, weight: 3 },
+        { name: "怠惰の絶対零度ベルフェゴル", cost: 27000000000000000000000000, income: 5300000000000000000000000, rarity: "God", color: "#00ffff", emoji: "💤❄️", speed: 7.0, weight: 3 },
+        { name: "ハッカー大天使ガブリエル", cost: 36000000000000000000000000, income: 7500000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🎺🪶", speed: 8.3, weight: 3 },
+        { name: "断罪天光の守護神ミカエル", cost: 48000000000000000000000000, income: 10500000000000000000000000, rarity: "God", color: "#00ffff", emoji: "⚔️👼", speed: 8.5, weight: 3 },
+        { name: "生命の樹統括ラファエル", cost: 64000000000000000000000000, income: 14800000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🧪🌿", speed: 8.1, weight: 3 },
+        { name: "神智大秘術の主ウリエル", cost: 85000000000000000000000000, income: 21000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🔥📖", speed: 8.2, weight: 3 },
+        { name: "星宿の支配神北斗七星コア", cost: 110000000000000000000000000, income: 30000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🌌✨", speed: 8.0, weight: 3 },
+        { name: "虚空劫火の支配神アグニ", cost: 150000000000000000000000000, income: 43000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🦏🔥", speed: 8.3, weight: 3 },
+        { name: "大気天災ジャッカーインドラ", cost: 200000000000000000000000000, income: 62000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐘⚡", speed: 8.4, weight: 3 },
+        { name: "森羅万象を司る梵天ブラフマ", cost: 270000000000000000000000000, income: 90000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🪷👑", speed: 8.1, weight: 3 },
+        { name: "宇宙維持の最高神ヴィシュヌ", cost: 360000000000000000000000000, income: 132000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🦅🔱", speed: 8.2, weight: 3 },
+        { name: "高天原の主宰アマテラスΩ", cost: 850000000000000000000000000, income: 435000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "☀️🪞", speed: 8.6, weight: 3 },
+        { name: "海領域ジャッカーツクヨミ", cost: 1100000000000000000000000000, income: 660000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🌙🌊", speed: 8.3, weight: 3 },
+        { name: "因果断絶の荒神スサノオ", cost: 1500000000000000000000000000, income: 1000000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐉⚔️", speed: 8.7, weight: 2 },
+        { name: "黄金龍の王ファフニールコア", cost: 2700000000000000000000000000, income: 2400000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐉🪙", speed: 8.5, weight: 2 },
+        { name: "時空喰らいのリヴァイアサン", cost: 3600000000000000000000000000, income: 3800000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🐋🌀", speed: 8.6, weight: 2 },
+        { name: "終焉の黙示録ベヒモス", cost: 4800000000000000000000000000, income: 6000000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🦏🌋", speed: 8.2, weight: 2 },
+        { name: "神速の雷帝トールハック", cost: 6400000000000000000000000000, income: 9600000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🔨⚡", speed: 9.0, weight: 2 },
+        { name: "全知の王オーディンコア", cost: 11000000000000000000000000000, income: 25500000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "👁️🦅", speed: 8.7, weight: 2 },
+        { name: "冥界裁判神アヌビス", cost: 15000000000000000000000000000, income: 42000000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "𓃠⚖️", speed: 8.4, weight: 2 },
+        { name: "虚空の創造主イザナギ", cost: 27000000000000000000000000000, income: 56500000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🧿", speed: 8.1, weight: 2 },
+        { name: "全知全能コード・アダム", cost: 48000000000000000000000000000, income: 105000000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🍏", speed: 8.2, weight: 1 },
+        { name: "無限イタリアンブレイン超越核", cost: 99999999999999999999999999999, income: 500000000000000000000000000000, rarity: "God", color: "#00ffff", emoji: "🧠🌌", speed: 8.5, weight: 1 },
+
+        // --- 🧪 フューズ（合成）実験限定の特殊融合体キメラ（バグ解消・コスト高位同期版） ---
+        { name: "【融合体】失敗作の失敗作", cost: 100, income: 1, rarity: "Common", color: "#9e9e9e", emoji: "🫠", speed: 1.2, weight: 0 },
+        { name: "【融合体】パルス肉腫キメラ", cost: 4200000, income: 1100000, rarity: "Uncommon", color: "#4caf50", emoji: "🥩⚡", speed: 2.0, weight: 0 },
+        { name: "【融合体】コードエラー狂戦士", cost: 437000000, income: 195000000, rarity: "Rare", color: "#2196f3", emoji: "🤖💢", speed: 2.8, weight: 0 },
+        { name: "【融合体】アジトを蝕む妖獣", cost: 40612000000, income: 17942000000, rarity: "Epic", color: "#9c27b0", emoji: "🌫️👹", speed: 3.2, weight: 0 },
+        { name: "【融合体】ハックされた生霊", cost: 650000000000000, income: 3700000000000, rarity: "Legendary", color: "#ff9800", emoji: "💻👻", speed: 4.8, weight: 0 },
+        { name: "【融合体】魔導サイボーグ・デウス", cost: 73300000000000000000, income: 2000000000000000000, rarity: "Mythic", color: "#e91e63", emoji: "🫀🤖", speed: 6.0, weight: 0 },
+        { name: "【融合体】キメラ・マザー", cost: 500000000000000000000000, income: 60000000000000000000000, rarity: "God", color: "#00ffff", emoji: "👁️‍鋪🧠", speed: 7.5, weight: 0 }
+    );
+    // --- キャラクター登録：Secret（秘密・最高隠し階級50体全員一挙登録） ---
+    fullCharDatabase.push(
+        { name: "【禁忌】世界を消す消しゴム", cost: 150000000000000000000000000000, income: 150000000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🧼", speed: 9.0, weight: 1 },
+        { name: "【終焉】システムそのものの崩壊", cost: 300000000000000000000000000000, income: 400000000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🚨", speed: 9.2, weight: 1 },
+        { name: "【審判】すべてを無に還すゼロ", cost: 600000000000000000000000000000, income: 999999999999999999999999999999, rarity: "Secret", color: "#76ff03", emoji: "0️⃣", speed: 9.5, weight: 1 },
+        { name: "【真の神】開発者の遊び心", cost: 999999999999999999999999999999, income: 999999999999999999999999999999, rarity: "Secret", color: "#76ff03", emoji: "👑💻", speed: 10.0, weight: 1 },
+        // --- 極秘エージェント軍団46体 ---
+        { name: "秘密工作員 S-01", cost: 10000000000000000000000, income: 5000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👤", speed: 8.8, weight: 1 },
+        { name: "秘密工作員 S-02", cost: 20000000000000000000000, income: 11000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👤", speed: 8.8, weight: 1 },
+        { name: "秘密工作員 S-03", cost: 40000000000000000000000, income: 24000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👤", speed: 8.9, weight: 1 },
+        { name: "秘密工作員 S-04", cost: 80000000000000000000000, income: 50000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👤", speed: 8.9, weight: 1 },
+        { name: "秘密工作員 S-05", cost: 160000000000000000000000, income: 110000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👤", speed: 9.0, weight: 1 },
+        { name: "極秘ハッカー X-01", cost: 320000000000000000000000, income: 250000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💻", speed: 9.1, weight: 1 },
+        { name: "極秘ハッカー X-02", cost: 640000000000000000000000, income: 550000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💻", speed: 9.1, weight: 1 },
+        { name: "極秘ハッカー X-03", cost: 1280000000000000000000000, income: 1200000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💻", speed: 9.2, weight: 1 },
+        { name: "極秘ハッカー X-04", cost: 2560000000000000000000000, income: 2600000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💻", speed: 9.2, weight: 1 },
+        { name: "極秘ハッカー X-05", cost: 5120000000000000000000000, income: 5800000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💻", speed: 9.3, weight: 1 },
+        { name: "シャドウマスター M-1", cost: 10000000000000000000000000, income: 13000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🥷", speed: 9.4, weight: 1 },
+        { name: "シャドウマスター M-2", cost: 20000000000000000000000000, income: 29000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🥷", speed: 9.4, weight: 1 },
+        { name: "シャドウマスター M-3", cost: 40000000000000000000000000, income: 65000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🥷", speed: 9.5, weight: 1 },
+        { name: "シャドウマスター M-4", cost: 80000000000000000000000000, income: 140000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🥷", speed: 9.5, weight: 1 },
+        { name: "シャドウマスター M-5", cost: 160000000000000000000000000, income: 320000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🥷", speed: 9.6, weight: 1 },
+        { name: "タイムエージェント T-1", cost: 320000000000000000000000000, income: 750000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "⏳", speed: 9.5, weight: 1 },
+        { name: "タイムエージェント T-2", cost: 640000000000000000000000000, income: 1800000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "⏳", speed: 9.5, weight: 1 },
+        { name: "タイムエージェント T-3", cost: 1280000000000000000000000000, income: 4200000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "⏳", speed: 9.6, weight: 1 },
+        { name: "タイムエージェント T-4", cost: 2560000000000000000000000000, income: 9900000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "⏳", speed: 9.6, weight: 1 },
+        { name: "タイムエージェント T-5", cost: 5120000000000000000000000000, income: 24000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "⏳", speed: 9.7, weight: 1 },
+        { name: "オメガバグ Ω-A", cost: 10000000000000000000000000000, income: 60000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🪲", speed: 9.8, weight: 1 },
+        { name: "オメガバグ Ω-B", cost: 20000000000000000000000000000, income: 150000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🪲", speed: 9.8, weight: 1 },
+        { name: "オメガバグ Ω-C", cost: 40000000000000000000000000000, income: 380000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🪲", speed: 9.9, weight: 1 },
+        { name: "オメガバグ Ω-D", cost: 80000000000000000000000000000, income: 960000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🪲", speed: 9.9, weight: 1 },
+        { name: "オメガバグ Ω-E", cost: 160000000000000000000000000000, income: 2400000000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🪲", speed: 10.0, weight: 1 },
+        { name: "量子ゴースト Q-1", cost: 200000000000000000000000000, income: 1000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👻", speed: 9.3, weight: 1 },
+        { name: "量子ゴースト Q-2", cost: 400000000000000000000000000, income: 2500000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👻", speed: 9.3, weight: 1 },
+        { name: "量子ゴースト Q-3", cost: 800000000000000000000000000, income: 6000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👻", speed: 9.4, weight: 1 },
+        { name: "量子ゴースト Q-4", cost: 1600000000000000000000000000, income: 15000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👻", speed: 9.4, weight: 1 },
+        { name: "量子ゴースト Q-5", cost: 3200000000000000000000000000, income: 40000000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "👻", speed: 9.5, weight: 1 },
+        { name: "ダミープラグ F-01", cost: 500000000000000000000, income: 2000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🔌", speed: 9.0, weight: 1 },
+        { name: "ダミープラグ F-02", cost: 1000000000000000000000, income: 5000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🔌", speed: 9.0, weight: 1 },
+        { name: "ダミープラグ F-03", cost: 2000000000000000000000, income: 12000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🔌", speed: 9.1, weight: 1 },
+        { name: "ダミープラグ F-04", cost: 4000000000000000000000, income: 30000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🔌", speed: 9.1, weight: 1 },
+        { name: "ダミープラグ F-05", cost: 8000000000000000000000, income: 80000000000000000, rarity: "Secret", color: "#76ff03", emoji: "🔌", speed: 9.2, weight: 1 },
+        { name: "コアサーバー壊滅兵 A", cost: 12000000000000000000000, income: 150000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💥", speed: 9.3, weight: 1 },
+        { name: "コアサーバー壊滅兵 B", cost: 24000000000000000000000, income: 400000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💥", speed: 9.3, weight: 1 },
+        { name: "コアサーバー壊滅兵 C", cost: 48000000000000000000000, income: 99000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💥", speed: 9.4, weight: 1 },
+        { name: "コアサーバー壊滅兵 D", cost: 96000000000000000000000, income: 250000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💥", speed: 9.4, weight: 1 },
+        { name: "コアサーバー壊滅兵 E", cost: 192000000000000000000000, income: 600000000000000000, rarity: "Secret", color: "#76ff03", emoji: "💥", speed: 9.5, weight: 1 },
+        { name: "ブラックボックス X", cost: 5000000000000000000000000000, income: 1500000000000000000000, rarity: "Secret", color: "#76ff03", emoji: "⬛", speed: 9.9, weight: 1 }
+    );
+    // --- ゲームの初期化 ＆ メインループ起動 ---
+    function initGame() {
+        setInterval(gameTick, 1000);
+        setInterval(spawnFlowingCharacter, 1200);
+        
+        function animate() {
+            moveFlowingCharacters();
+            requestAnimationFrame(animate);
+        }
+        animate();
+        updateUI();
+    }
+
+    // コンベア上のキャラクターの移動と発光演出
+    function moveFlowingCharacters() {
+        const containerWidth = 900;
+        activeFlowingChars.forEach((char, index) => {
+            char.posX += char.speed;
+            const el = document.getElementById(`flow-${char.id}`);
+            if (el) {
+                el.style.left = char.posX + 'px';
+                if (money >= char.cost && myTeam.length < teamLimit) {
+                    el.style.borderColor = char.trait !== "なし" ? char.traitColor : char.color;
+                    el.style.boxShadow = char.mutation !== "なし" ? "0 0 12px #ff3333" : `0 0 8px ${char.color}`;
+                } else {
+                    el.style.borderColor = "#331a1a";
+                    el.style.boxShadow = "none";
+                }
+            }
+            if (char.posX > containerWidth) {
+                if (el) el.remove();
+                activeFlowingChars.splice(index, 1);
+            }
+        });
+    }
+
+    // キャラクターの雇用
+    function buyCharacter(id) {
+        const index = activeFlowingChars.findIndex(c => c.id === id);
+        if (index === -1) return;
+
+        const char = activeFlowingChars[index];
+
+        if (myTeam.length >= teamLimit) {
+            alert(`アジト（基地）が満員です！\nキャラを売却するか、「生まれ変わり」をして上限を増やしてください！`);
+            return;
+        }
+
+        if (money < char.cost) return;
+
+        money -= char.cost;
+        const el = document.getElementById(`flow-${id}`);
+        if (el) el.remove();
+        activeFlowingChars.splice(index, 1);
+
+        myTeam.push({
+            uniqueId: Date.now() + Math.random(), 
+            name: char.name,
+            cost: char.cost,
+            income: char.income, 
+            rarity: char.rarity,
+            color: char.color,
+            emoji: char.emoji,
+            trait: char.trait,
+            traitColor: char.traitColor,
+            mutation: char.mutation
+        });
+
+        recalculateMps();
+        renderMyTeam();
+        updateUI();
+        saveGame(); 
+    }
+
+    // アジトメンバーの売却システム
+    function sellCharacter(uId) {
+        const index = myTeam.findIndex(c => c.uniqueId === uId);
+        if (index === -1) return;
+
+        const char = myTeam[index];
+        const refund = Math.floor(char.cost / 2);
+        money += refund;
+
+        myTeam.splice(index, 1); 
+
+        recalculateMps();
+        renderMyTeam();
+        updateUI();
+        saveGame(); 
+    }
+    // 重み付きランダム抽選 ＆ 【暗号コードバフ連動型の出現シミュレート】
+    function spawnFlowingCharacter() {
+        const now = Date.now();
+        // 📟 50大シリアルコードのバフが現在有効かリアルタイム判定
+        const isLuckActive = now < codeBuffLuckEndTime;
+        const isRainbowActive = now < codeBuffRainbowEndTime;
+
+        // 購入可能なレベルのキャラを流す（詰まり・虚無防止）
+        const availableChars = fullCharDatabase.filter(char => char.cost <= Math.max(100, money * 50, nextStartMoney * 2));
+        if (availableChars.length === 0) return;
+
+        let totalWeight = 0;
+        const weightMapped = availableChars.map(char => {
+            let fw = char.weight;
+            
+            // 🌀 転生回数に応じて、上位レアリティの出現確率が爆発的にアップ！
+            if (char.rarity === "Uncommon")  fw *= (1 + rebornCount * 0.5);
+            if (char.rarity === "Rare")      fw *= (1 + rebornCount * 1.5);
+            if (char.rarity === "Epic")      fw *= (1 + rebornCount * 5.0);
+            if (char.rarity === "Legendary") fw *= (1 + rebornCount * 25.0);
+            if (char.rarity === "Mythic")    fw *= (1 + rebornCount * 150.0);
+            if (char.rarity === "God")       fw *= (1 + rebornCount * 500.0);
+            if (char.rarity === "Secret")    fw *= (1 + rebornCount * 2000.0);
+            
+            // 📟 【暗号コード連動】：確率変変バフが有効な間、コモン以外の上位レア出現率が一挙に10倍！
+            if (isLuckActive && char.rarity !== "Common") {
+                fw *= 10;
+            }
+
+            // 転生が進むと、初期のコモンキャラは出にくくなりコンベアが最適化される
+            if (char.rarity === "Common" && rebornCount > 0) {
+                fw /= (1 + rebornCount * 2); 
+            }
+            totalWeight += fw;
+            return { char: char, w: fw };
+        });
+
+        let randomChoice = Math.random() * totalWeight;
+        let selectedChar = availableChars;
+        for (let item of weightMapped) {
+            randomChoice -= item.w;
+            if (randomChoice <= 0) {
+                selectedChar = item.char;
+                break;
+            }
+        }
+
+        // 🎲 【属性（オーラ）の抽選】
+        let traitName = "なし";
+        let traitMult = 1.0;
+        let traitColor = "transparent";
+        
+        if (isRainbowActive) {
+            // 📟 【暗号コード連動】：確定レインボーバフ中なら、流れるエージェントが100%確定でレインボーオーラ（秒給10倍）に！
+            traitName = "レインボー";
+            traitMult = 10.0;
+            traitColor = "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff)";
+        } else {
+            // 通常確率での抽選
+            const randTrait = Math.random();
+            if (randTrait < 0.02) {
+                traitName = "レインボー";
+                traitMult = 10.0;
+                traitColor = "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff)";
+            } else if (randTrait < 0.07) {
+                traitName = "地獄";
+                traitMult = 8.0;
+                traitColor = "#e65100";
+            } else if (randTrait < 0.17) {
+                traitName = "金";
+                traitMult = 1.5;
+                traitColor = "#ffd700";
+            } else if (randTrait < 0.37) {
+                traitName = "銀";
+                traitMult = 1.25;
+                traitColor = "#c0c0c0";
+            }
+        }
+
+        // 🎲 【変異（覚醒）の抽選】 (10%の確率でさらに3倍の「悪魔」化)
+        let mutationName = "なし";
+        let mutationMult = 1.0;
+        if (Math.random() < 0.10) {
+            mutationName = "悪魔";
+            mutationMult = 3.0;
+        }
+
+        // 属性・変異倍率を掛け合わせて最終秒給を決定
+        const finalIncome = Math.floor(selectedChar.income * traitMult * mutationMult);
+
+        const newFlow = {
+            id: flowingIdCounter++,
+            name: selectedChar.name,
+            cost: selectedChar.cost,
+            income: finalIncome, 
+            rarity: selectedChar.rarity,
+            color: selectedChar.color,
+            emoji: selectedChar.emoji,
+            speed: selectedChar.speed,
+            posX: -150,
+            trait: traitName,
+            traitMult: traitMult,
+            traitColor: traitColor,
+            mutation: mutationName,
+            mutationMult: mutationMult
+        };
+
+        const el = document.createElement('div');
+        el.className = 'flow-card';
+        el.id = `flow-${newFlow.id}`;
+        el.style.backgroundColor = '#15151c';
+        el.onclick = () => buyCharacter(newFlow.id);
+        
+        let badgeColor = "#555";
+        let textColor = "#fff";
+        if(newFlow.rarity === "Original")  badgeColor = "#e1b12c";
+        if(newFlow.rarity === "Uncommon")  badgeColor = "#4caf50";
+        if(newFlow.rarity === "Rare")      badgeColor = "#2196f3";
+        if(newFlow.rarity === "Epic")      badgeColor = "#9c27b0";
+        if(newFlow.rarity === "Legendary") badgeColor = "#ff9800";
+        if(newFlow.rarity === "Mythic")    badgeColor = "#e91e63";
+        if(newFlow.rarity === "God")       { badgeColor = "#00ffff"; textColor = "#000"; }
+        if(newFlow.rarity === "Secret")    { badgeColor = "linear-gradient(45deg, #76ff03, #00e5ff)"; textColor = "#000"; }
+
+        let traitsHtml = "";
+        if (newFlow.trait !== "なし") {
+            traitsHtml += `<span class="trait-badge" style="background:${newFlow.traitColor}">${newFlow.trait}</span>`;
+        }
+        if (newFlow.mutation !== "なし") {
+            traitsHtml += `<span class="mut-badge">${newFlow.mutation}</span>`;
+        }
+
+        el.innerHTML = `
+            <div class="flow-rarity" style="background:${badgeColor}; color:${textColor};">${newFlow.rarity}</div>
+            <div style="font-size:24px; margin-top:2px;">${newFlow.emoji}</div>
+            <div class="flow-name">${newFlow.name}</div>
+            <div class="flow-traits">${traitsHtml}</div>
+            <div class="flow-cost">${formatNumber(newFlow.cost)}円</div>
+            <div class="flow-inc">+${formatNumber(Math.floor(newFlow.income * earnMultiplier))}/秒</div>
+        `;
+
+        document.getElementById('lane-container').appendChild(el);
+        activeFlowingChars.push(newFlow);
+
+        document.getElementById('spawn-counter').innerText = `解放済みの種類: ${availableChars.length} / 600 種`;
+    }
+    // 📟 【50大シリアルコード対応】暗号コード送信・報酬処理システム
+    function submitSecretCode() {
+        const inputEl = document.getElementById('secret-code-input');
+        const codeText = inputEl.value.trim();
+        if (!codeText) return;
+
+        const codeNum = parseInt(codeText, 10);
+
+        // ⚠️ 1回きりの重複使用防止チェック
+        if (usedSecretCodes.includes(codeNum)) {
+            alert(`📟 端末エラー: この暗号コード（${codeNum}）はすでに使用されています！`);
+            inputEl.value = "";
+            return;
+        }
+
+        const now = Date.now();
+        let codeAccepted = false;
+        let msg = "";
+
+        // 💰 【1-20】お金がもらえるコード (1001～1020)
+        if (codeNum >= 1001 && codeNum <= 1020) {
+            let gift = (codeNum - 1000) * 10000; // 1万～20万円支給
+            money += gift;
+            msg = `💰 資金供給コード承認！臨時ボーナスとして【 ${formatNumber(gift)} 円 】を獲得しました！`;
+            codeAccepted = true;
+        }
+        // ⚡ 【21-35】秒給倍率アップコード (2001～2015)
+        else if (codeNum >= 2001 && codeNum <= 2015) {
+            let mins = (codeNum - 2000) * 2; // 2分～30分間バフ
+            codeBuffDoubleEndTime = Math.max(codeBuffDoubleEndTime, now) + (mins * 60 * 1000);
+            msg = `⚡ 国家予算ブースト承認！【 ${mins} 分間 】、アジト全体の総秒給が『2倍』に跳ね上がります！`;
+            codeAccepted = true;
+        }
+        // 🔮 【36-40】上位レア出現率10倍ラックコード (3001～3005)
+        else if (codeNum >= 3001 && codeNum <= 3005) {
+            let mins = (codeNum - 3000) * 3; // 3分～15分間バフ
+            codeBuffLuckEndTime = Math.max(codeBuffLuckEndTime, now) + (mins * 60 * 1000);
+            msg = `🛸 確率確変回路同調！【 ${mins} 分間 】、コンベアのコモン以外の上位レア出現率が『10倍』に暴騰します！`;
+            codeAccepted = true;
+        }
+        // 🌈 【41-45】100%確定レインボーオーラコード (4001～4005)
+        else if (codeNum >= 4001 && codeNum <= 4005) {
+            let mins = (codeNum - 4000) * 2; // 2分～10分間バフ
+            codeBuffRainbowEndTime = Math.max(codeBuffRainbowEndTime, now) + (mins * 60 * 1000);
+            msg = `🌈 レインボー共鳴検知！【 ${mins} 分間 】、流れる全キャラが秒給10倍の『レインボーオーラ』を100%確定でまといます！`;
+            codeAccepted = true;
+        }
+        // 👑 【46-50】キャラクター直接支給コード (5001～5005)
+        else if (codeNum >= 5001 && codeNum <= 5005) {
+            if (myTeam.length >= teamLimit) {
+                alert("❌ アジトが満員です！空き枠を作ってから入力してください。");
+                return;
+            }
+            let targetRarity = "Rare";
+            if (codeNum === 5001) targetRarity = "Rare";
+            if (codeNum === 5002) targetRarity = "Epic";
+            if (codeNum === 5003) targetRarity = "Legendary";
+            if (codeNum === 5004) targetRarity = "Mythic";
+            if (codeNum === 5005) targetRarity = "Original"; // ✨ OGは1つだけ！
+
+            const pool = fullCharDatabase.filter(c => c.rarity === targetRarity);
+            if (pool.length > 0) {
+                const reward = pool[Math.floor(Math.random() * pool.length)];
+                myTeam.push({
+                    uniqueId: Date.now() + Math.random(), name: reward.name, cost: reward.cost,
+                    income: reward.income, rarity: reward.rarity, color: reward.color, emoji: reward.emoji,
+                    trait: "なし", traitColor: "transparent", mutation: "なし"
+                });
+                msg = `📟 人事コード承認！【${targetRarity}】エージェントがアジトに直撃配属されました！\n\n【配属】${reward.emoji} ${reward.name}`;
+                codeAccepted = true;
+            }
+        }
+
+        // コードが有効ならブラックリストに放り込んで二度打ち防止
+        if (codeAccepted) {
+            usedSecretCodes.push(codeNum);
+            alert(msg);
+            recalculateMps();
+            renderMyTeam();
+            updateUI();
+            saveGame();
+        } else {
+            alert("❌ 認識できない無効な暗号コードです。");
+        }
+
+        inputEl.value = "";
+    }
+
+    // ⏳ 暗号バフのカウントダウンタイマーUI表示
+    function updateBuffTimerUI() {
+        const now = Date.now();
+        const statusEl = document.getElementById('code-timer-status');
+        statusEl.innerHTML = "";
+
+        if (now < codeBuffDoubleEndTime) {
+            const secLeft = Math.ceil((codeBuffDoubleEndTime - now) / 1000);
+            statusEl.innerHTML += `<span style="color:#ffeb3b;">⚡ 【暗号バフ】総秒給2倍ブースト起動中! (残り ${secLeft} 秒)</span>`;
+        }
+        if (now < codeBuffLuckEndTime) {
+            const secLeft = Math.ceil((codeBuffLuckEndTime - now) / 1000);
+            statusEl.innerHTML += `<span style="color:#00ffff;">🛸 【暗号バフ】上位レア出現率10倍確変中! (残り ${secLeft} 秒)</span>`;
+        }
+        if (now < codeBuffRainbowEndTime) {
+            const secLeft = Math.ceil((codeBuffRainbowEndTime - now) / 1000);
+            statusEl.innerHTML += `<span style="color:#76ff03;">🌈 【暗号バフ】流れる全キャラ100%レインボー確定! (残り ${secLeft} 秒)</span>`;
+        }
+    }
+    // 🧪 フューズスロットの画面描画（素材合計コストの1000%請求・鉄壁ガード版）
+    function renderFuseSlots() {
+        let totalMaterialCost = 0; 
+
+        for (let i = 0; i < 4; i++) {
+            const slotEl = document.getElementById(`fuse-slot-${i}`);
+            const uniqueId = fuseSelectedIds[i];
+
+            if (uniqueId === null) {
+                slotEl.className = "fuse-slot";
+                slotEl.innerHTML = `【空き枠】<br>選択して下さい`;
+                slotEl.style.borderColor = "#553366";
+                slotEl.style.boxShadow = "none";
+            } else {
+                const char = myTeam.find(c => c.uniqueId === uniqueId);
+                if (!char) {
+                    fuseSelectedIds[i] = null;
+                    continue;
+                }
+                slotEl.className = "fuse-slot filled";
+                totalMaterialCost += char.cost;
+
+                let sBorder = char.color;
+                if (char.rarity === "Original") sBorder = "#e1b12c";
+                if (char.rarity === "God") sBorder = "#00ffff";
+                if (char.rarity === "Secret") sBorder = "#76ff03";
+                if (char.trait !== "なし") sBorder = char.traitColor;
+
+                slotEl.style.borderColor = sBorder;
+                slotEl.innerHTML = `
+                    <div style="font-size:16px;">${char.emoji}</div>
+                    <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%; font-weight:bold;">${char.name}</div>
+                    <div style="color:#aaa; font-size:9px;">${char.rarity}</div>
+                    <div class="fuse-slot-remove">クリックで解除</div>
+                `;
+            }
+        }
+
+        const fuseCost = totalMaterialCost * 10;
+        const filledCount = fuseSelectedIds.filter(id => id !== null).length;
+        const fuseBtn = document.getElementById('fuse-button');
+
+        if (filledCount < 4) {
+            fuseBtn.disabled = true;
+            fuseBtn.style.background = "#222";
+            fuseBtn.innerHTML = `💥 遺伝子コード融合を実行する（4体必要）`;
+        } else {
+            if (money >= fuseCost) {
+                fuseBtn.disabled = false;
+                fuseBtn.style.background = "linear-gradient(135deg, #e91e63, #9c27b0)";
+                fuseBtn.innerHTML = `💥 遺伝子コード融合を実行する（費用: ${formatNumber(fuseCost)} 円）`;
+            } else {
+                fuseBtn.disabled = true; 
+                fuseBtn.style.background = "#331a1a";
+                fuseBtn.innerHTML = `❌ 資金不足（必要: ${formatNumber(fuseCost)} 円）`;
+            }
+        }
+    }
+
+    // アジトからフューズ室への転送
+    function sendToFuse(uId) {
+        const slotIdx = fuseSelectedIds.findIndex(id => id === null);
+        if (slotIdx === -1) {
+            alert("🧪 フューズ室はすでに満員（4体）です！");
+            return;
+        }
+        fuseSelectedIds[slotIdx] = uId;
+        renderFuseSlots();
+        renderMyTeam();
+    }
+
+    // フューズ室からの解除
+    function removeFromFuse(slotIdx) {
+        fuseSelectedIds[slotIdx] = null;
+        renderFuseSlots();
+        renderMyTeam();
+    }
+
+    // 💥 運命の4体融合（フューズ）実行ロジック（素材コスト合計の1000%徴収）
+    function executeCharacterFusion() {
+        const selectedChars = [];
+        let totalMaterialCost = 0; 
+
+        for (let id of fuseSelectedIds) {
+            const char = myTeam.find(c => c.uniqueId === id);
+            if (!char) return;
+            selectedChars.push(char);
+            totalMaterialCost += char.cost;
+        }
+
+        const fuseCost = totalMaterialCost * 10;
+
+        if (money < fuseCost) {
+            alert(`研究資金が不足しています！\nフューズには ${formatNumber(fuseCost)} 円 必要です。`);
+            return;
+        }
+
+        money -= fuseCost;
+
+        const rRank = { "Common": 1, "Uncommon": 2, "Rare": 3, "Epic": 4, "Legendary": 5, "Mythic": 6, "God": 7, "Secret": 8 };
+        const rName = [null, "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "God", "Secret"];
+        
+        let sumRank = selectedChars.reduce((sum, c) => sum + rRank[c.rarity], 0);
+        let avgRank = Math.round(sumRank / 4); 
+
+        let targetRank = avgRank;
+        let isSuccess = Math.random() < 0.30; 
+
+        if (isSuccess) {
+            targetRank = Math.min(8, avgRank + 1); 
+        } else {
+            targetRank = Math.max(1, avgRank - 1); 
+        }
+
+        const targetRarityName = rName[targetRank];
+        const pool = fullCharDatabase.filter(c => c.rarity === targetRarityName);
+        if (pool.length === 0) return;
+        const rewardChar = pool[Math.floor(Math.random() * pool.length)];
+
+        fuseSelectedIds.forEach(id => {
+            const idx = myTeam.findIndex(c => c.uniqueId === id);
+            if (idx !== -1) myTeam.splice(idx, 1);
+        });
+        fuseSelectedIds = [null, null, null, null];
+
+        const newUniqueId = Date.now() + Math.random();
+        myTeam.push({
+            uniqueId: newUniqueId, name: rewardChar.name, cost: rewardChar.cost, income: rewardChar.income, 
+            rarity: rewardChar.rarity, color: rewardChar.color, emoji: rewardChar.emoji,
+            trait: "なし", traitColor: "transparent", mutation: "なし"
+        });
+
+        if (isSuccess) {
+            alert(`🧪 融合大成功（確率30%の奇跡）！\n\n研究費 ${formatNumber(fuseCost)} 円を投じた実験により、ワンランク上の高位エージェントが誕生しました！\n\n【誕生】${rewardChar.emoji} ${rewardChar.name} (${rewardChar.rarity})`);
+        } else {
+            alert(`🧪 融合結果（確率70%の通常降格）\n\n研究費 ${formatNumber(fuseCost)} 円を投じましたが遺伝子が劣化し、ワンランク下の階級に落ち着きました…\n\n【誕生】${rewardChar.emoji} ${rewardChar.name} (${rewardChar.rarity})`);
+        }
+
+        recalculateMps(); renderFuseSlots(); renderMyTeam(); updateUI(); saveGame();
+    }
+    // アジト（基地）メンバーの描画システム
+    function renderMyTeam() {
+        const container = document.getElementById('team-container');
+        container.innerHTML = '';
+        
+        myTeam.forEach(char => {
+            const isSelectedForFuse = fuseSelectedIds.includes(char.uniqueId);
+            const card = document.createElement('div');
+            card.className = 'team-card';
+            if (isSelectedForFuse) card.style.opacity = "0.3";
+            
+            let cardBorderColor = char.color;
+            if (char.rarity === "Original") cardBorderColor = "#e1b12c";
+            if (char.rarity === "God") cardBorderColor = "#00ffff";
+            if (char.rarity === "Secret") cardBorderColor = "#76ff03";
+            if (char.trait !== "なし") cardBorderColor = char.traitColor;
+            
+            card.style.borderColor = cardBorderColor;
+            if (char.mutation !== "なし" || char.rarity === "Secret") card.style.boxShadow = "0 0 6px #ff3333";
+            
+            const isDoubleActive = Date.now() < codeBuffDoubleEndTime;
+            const currentEarnMult = isDoubleActive ? (earnMultiplier * 2) : earnMultiplier;
+            const realIncome = Math.floor(char.income * currentEarnMult);
+
+            let traitsHtml = "";
+            if (char.trait !== "なし") traitsHtml += `<span class="trait-badge" style="background:${char.traitColor}; font-size:8px; padding:0 2px;">${char.trait}</span>`;
+            if (char.mutation !== "なし") traitsHtml += `<span class="mut-badge" style="font-size:8px; padding:0 2px;">${char.mutation}</span>`;
+
+            card.innerHTML = `
+                <div style="font-size:16px;">${char.emoji}</div>
+                <div style="font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${char.name}</div>
+                <div style="margin: 2px 0; display:flex; justify-content:center; gap:2px;">${traitsHtml}</div>
+                <div style="color:#81c784;">+${formatNumber(realIncome)}/秒</div>
+                <button class="sell-btn" onclick="sellCharacter(${char.uniqueId})">売却 (+${formatNumber(Math.floor(char.cost/2))})</button>
+                <button class="fuse-send-btn" onclick="sendToFuse(${char.uniqueId})" ${isSelectedForFuse ? 'disabled' : ''}>フューズ室へ</button>
+            `;
+            container.appendChild(card);
+        });
+        document.getElementById('team-counter').innerText = `基地の空き枠: ${myTeam.length} / ${teamLimit} 人`;
+    }
+
+    // 💾 セーブ機能（新50大暗号の使用済みブラックリストも確実に保護）
+    function saveGame() {
+        try {
+            const cleanTeam = myTeam.map(c => ({
+                uniqueId: c.uniqueId, name: c.name, cost: c.cost, income: c.income,
+                rarity: c.rarity, color: c.color, emoji: c.emoji, trait: c.trait, traitColor: c.traitColor, mutation: c.mutation
+            }));
+            const saveData = {
+                money: money, rebornCount: rebornCount, earnMultiplier: earnMultiplier,
+                rebornCost: rebornCost, nextStartMoney: nextStartMoney, teamLimit: teamLimit, myTeam: cleanTeam,
+                usedSecretCodes: usedSecretCodes 
+            };
+            localStorage.setItem("it_brain_save_v12_mega_crypto", JSON.stringify(saveData));
+        } catch (e) { console.error("保存失敗", e); }
+    }
+
+    // 📂 ロード機能
+    function loadGame() {
+        const saved = localStorage.getItem("it_brain_save_v12_mega_crypto");
+        if (!saved) return;
+        try {
+            const data = JSON.parse(saved);
+            money = data.money ?? 100;
+            rebornCount = data.rebornCount ?? 0;
+            earnMultiplier = data.earnMultiplier ?? 1.0;
+            rebornCost = data.rebornCost ?? 100000;
+            nextStartMoney = data.nextStartMoney ?? 500;
+            teamLimit = data.teamLimit ?? 10;
+            myTeam = data.myTeam ?? [];
+            usedSecretCodes = data.usedSecretCodes ?? [];
+            
+            recalculateMps(); renderFuseSlots(); renderMyTeam();
+        } catch (e) { localStorage.removeItem("it_brain_save_v12_mega_crypto"); }
+    }
+
+    function resetAllGameData() {
+        if (confirm("本当に最初からやり直しますか？\n全ての進捗とシリアル使用履歴が完全に消去されます。")) {
+            localStorage.removeItem("it_brain_save_v12_mega_crypto");
+            location.reload();
+        }
+    }
+
+    function recalculateMps() {
+        const isDoubleActive = Date.now() < codeBuffDoubleEndTime;
+        const currentEarnMult = isDoubleActive ? (earnMultiplier * 2) : earnMultiplier;
+        totalMps = Math.floor(myTeam.reduce((sum, c) => sum + c.income, 0) * currentEarnMult);
+    }
+
+    let tickCounter = 0;
+    function gameTick() {
+        recalculateMps(); 
+        money += totalMps;
+        updateBuffTimerUI(); 
+        updateUI();
+        tickCounter++;
+        if (tickCounter >= 5) { saveGame(); tickCounter = 0; }
+    }
+
+    function triggerReborn() {
+        if (money < rebornCost) return;
+
+        rebornCount++;
+        earnMultiplier += 0.5;
+        teamLimit += 5;
+
+        rebornCost *= 10;
+        money = nextStartMoney;
+        nextStartMoney *= 3; //次回開始金が3倍に増えていくリバランス仕様
+
+        myTeam = []; 
+        fuseSelectedIds = [null, null, null, null];
+        totalMps = 0;
+
+        alert(`🌀 転生しました！ (第 ${rebornCount} 世界へ)\n\nアジト上限枠: ${teamLimit}人\n稼ぎ倍率: ${earnMultiplier.toFixed(1)}倍\n\n【3倍リバランス発動】\n開始資金が前回の3倍の ${formatNumber(money)} 円にアップ！`);
+
+        renderFuseSlots(); renderMyTeam(); updateUI(); saveGame();
+    }
+
+    function formatNumber(num) { return num.toLocaleString(); }
+
+    function updateUI() {
+        document.getElementById('money-disp').innerText = formatNumber(money);
+        document.getElementById('mps-disp').innerText = formatNumber(totalMps);
+        document.getElementById('multiplier-disp').innerText = (Date.now() < codeBuffDoubleEndTime) ? (earnMultiplier * 2).toFixed(1) + " (暗号バフx2)" : earnMultiplier.toFixed(1);
+        document.getElementById('reborn-disp').innerText = rebornCount;
+        document.getElementById('next-start-disp').innerText = formatNumber(nextStartMoney);
+        document.getElementById('reborn-cost-disp').innerText = formatNumber(rebornCost);
+        document.getElementById('reborn-button').disabled = money < rebornCost;
+    }
+
+    loadGame();
+    initGame();
+</script>
+</body>
+</html>
